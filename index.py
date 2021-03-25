@@ -14,14 +14,20 @@ def two_week_check():
     #almost_finished_subscriptions = functions.filter_almost_finished_subscriptions(subscribed_deals)
     almost_finished_subscriptions = [
         {
-        "title": "Test subscription 1"
+        "title": "This is a test subscription that finishes in 2 weeks"
         },
         {
-        "title": "Test subscription 2"
+        "title": "This is a test subscription that finishes in 2 weeks"
         },
         {
-        "title": "Test subscription 3"
+        "title": "This is a test subscription that finishes in 2 weeks"
         },
+        {
+        "title": "This is a test subscription that finishes in 2 weeks"
+        },
+        {
+        "title": "This is a test subscription that finishes in 2 weeks"
+        }
     ]
 
     # Sending emails (if any)
@@ -37,7 +43,7 @@ def two_week_check():
         # Sending email
         subejct = 'Subscriptions finishing in 2 weeks'
         mail_parts = mail_handler.build_almost_finished_subscriptions_two_week_notification_mail_parts(almost_finished_subscriptions)
-        recipients = ['n.winspear@leadership.ac.nz']
+        recipients = ['n.winspear@leadership.ac.nz', 's.thomas@leadership.ac.nz', 'd.rosenthal@leadership.ac.nz']
         mail_handler_response = mail_handler.send_emails(mail_parts, subejct, recipients)
 
     return mail_handler_response
