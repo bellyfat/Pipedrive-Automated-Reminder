@@ -47,7 +47,7 @@ def create_log(response: str) -> None:
         # Writing to file
         f = open("{}/{}.txt".format(log_folder_path, filename), "w")
         f.write("Check performed at: {}\n\n{}".format(
-            datetime.datetime.now(), json.dumps(response.json(), indent=4, sort_keys=True)))
+            datetime.datetime.now(), json.dumps(response, indent=4, sort_keys=True)))
         f.close()
     except Exception as err:
         print("Failed to create log \n", err)
