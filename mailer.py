@@ -45,7 +45,7 @@ class Mailer:
                     email_response["successful"] += 1
                 except Exception as err:
                     email_response["failed"].append({"recipient": recipient, "reason": err})
-
+                
         return email_response
 
     def build_almost_finished_subscriptions_two_week_notification_mail_parts(self, almost_finished_subscriptions:list) -> dict:
