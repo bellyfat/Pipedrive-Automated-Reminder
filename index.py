@@ -36,8 +36,8 @@ def two_week_check():
             "message": "No messages to send."
         }
 
-    #if datetime.datetime.now().day == 1:
-    mail_handler_response["subscribed_deals"] = subscribed_deals
+    if datetime.datetime.now().day == 10:
+        mail_handler_response["subscribed_deals"] = subscribed_deals
 
     return mail_handler_response
 
@@ -77,7 +77,7 @@ def main():
     if response["subscribed_deals"]:
         csv_response = monthly_revenue_report(response["subscribed_deals"])
         response["csv_response"] = csv_response
-    #create_log(response)
+    create_log(response)
 
 
 main()
