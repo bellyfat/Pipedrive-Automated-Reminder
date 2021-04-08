@@ -1,8 +1,11 @@
+import csv
+from datetime import datetime
 from email import message
 import smtplib
 import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
 class Mailer:
 
@@ -33,8 +36,14 @@ class Mailer:
                 email["To"] = recipient
 
                 # Attaching mail parts
-                email.attach(mail_parts["text_part"])
-                email.attach(mail_parts["html_part"])
+                if mail_parts['text_part']:
+                    email.attach(mail_parts["text_part"])
+                if mail_parts['html_part']:
+                    email.attach(mail_parts["html_part"])
+                if mail_parts["csv_file_path"]:
+                    with open(f"{mail_parts['csv_file_path']}.csv", 'rb') as file:
+                        file_name = f"MTP Subscription Data | {datetime.now().date()}.csv"
+                        email.attach(MIMEApplication(file.read(), Name=file_name))
 
                 # Finalising email body
                 email_body = email.as_string()
@@ -47,6 +56,24 @@ class Mailer:
                     email_response["failed"].append({"recipient": recipient, "reason": err})
                 
         return email_response
+
+    def build_mtp_data_csv_mail_parts(self, csv_file_path: str) -> dict:
+
+        text_part = f"""\
+            Good morning!
+            
+            Attached is the latest MTP Monthly Revenue Data.
+
+            This message was send by Nathan's automated MTP Monthly Revenue Data Generator system.
+        """
+
+        text_mail_part = MIMEText(text_part, 'plain')
+
+        return {
+            "text_part": text_mail_part,
+            "html_part": None,
+            "csv_file_path": csv_file_path
+        }
 
     def build_almost_finished_subscriptions_two_week_notification_mail_parts(self, almost_finished_subscriptions:list) -> dict:
 
@@ -171,5 +198,6 @@ class Mailer:
 
         return {
             "text_part": text_mail_part,
-            "html_part": html_mail_part
+            "html_part": html_mail_part,
+            "csv_file_path": None
         }

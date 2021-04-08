@@ -36,6 +36,9 @@ def two_week_check():
             "message": "No messages to send."
         }
 
+    #if datetime.datetime.now().day == 1:
+    mail_handler_response["subscribed_deals"] = subscribed_deals
+
     return mail_handler_response
 
 def create_log(response: str) -> None:
@@ -52,9 +55,29 @@ def create_log(response: str) -> None:
     except Exception as err:
         print("Failed to create log \n", err)
 
+def monthly_revenue_report(subscribed_deals: dict) -> dict:
+    csv_file_path = functions.generate_subscribed_deals_data_for_monthly_revenue_report(subscribed_deals)
+    
+    # Creating Mailer
+    sender_email = os.getenv("SENDER_EMAIL")
+    sender_password = os.getenv("SENDER_PASSWORD")
+    host = os.getenv("HOST")
+    port = os.getenv("PORT")
+    mail_handler = mailer.Mailer(sender_email, sender_password, host, port)
+
+    # Sending email
+    subejct = 'MTP Montly Revenue Report Data'
+    mail_parts = mail_handler.build_mtp_data_csv_mail_parts(csv_file_path)
+    recipients = ['n.winspear@leadership.ac.nz', 'd.somashekarappa@leadership.ac.nz']
+    mail_handler_response = mail_handler.send_emails(mail_parts, subejct, recipients)
+    return mail_handler_response
+
 def main():
     response = two_week_check()
-    create_log(response)
-    
+    if response["subscribed_deals"]:
+        csv_response = monthly_revenue_report(response["subscribed_deals"])
+        response["csv_response"] = csv_response
+    #create_log(response)
+
 
 main()

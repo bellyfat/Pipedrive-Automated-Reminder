@@ -1,6 +1,7 @@
 import os
 import requests
 import datetime
+import csv
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -52,3 +53,46 @@ def filter_almost_finished_subscriptions(subscribed_deals: list) -> list:
             if day_count_difference <= 14:
                 almost_finished_subscriptions.append(deal)
     return almost_finished_subscriptions
+
+##########################################################################################
+#                               Deal Data Functions                                      #
+##########################################################################################
+
+def get_deal_fields(required_fields: list) -> list:
+    request_uri = build_request_uri('/dealFields')
+    deal_fields = requests.get(request_uri).json()["data"]
+    filtered_deal_fields = []
+    for deal_field in deal_fields:
+        if deal_field["name"] in required_fields:
+            filtered_deal_fields.append(deal_field)
+    return filtered_deal_fields
+
+def extract_deal_fields(subscribed_deals: list, deal_fields:list) -> dict:
+    extracted_deal_fields = []
+    for deal in subscribed_deals:
+        deal_field_values = {
+            "deal": deal,
+        }
+        for field in deal_fields:
+            if deal[f"{field['key']}"]:
+                for option in field["options"]:
+                    if option['id'] == int(deal[f"{field['key']}"]):
+                        deal_field_values[field["name"].replace(" ", "_").lower()] = option["label"]
+        extracted_deal_fields.append(deal_field_values)
+
+    return extracted_deal_fields
+
+def write_csv_file(extracted_deal_fields: dict) -> str:
+    file_name = f"/home/pi/Documents/Github/Pipedrive-Automated-Reminder/MTPExports/MTP Subscription Data | {datetime.datetime.now().date()}"
+    with open(f"{file_name}.csv", 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Organisation Name', 'Deal Title', 'Annual Subscription Value', 'Client Source'])
+        for extracted_deal in extracted_deal_fields:
+            writer.writerow([extracted_deal["deal"]["org_name"], extracted_deal["deal"]["title"], extracted_deal["deal"]["value"], extracted_deal["client_source"]])
+    return file_name
+
+def generate_subscribed_deals_data_for_monthly_revenue_report(subscribed_deals: list) -> str:
+    deal_fields = get_deal_fields(['Client Source'])
+    extracted_deal_fields = extract_deal_fields(subscribed_deals, deal_fields)
+    csv_file_path = write_csv_file(extracted_deal_fields)
+    return csv_file_path
