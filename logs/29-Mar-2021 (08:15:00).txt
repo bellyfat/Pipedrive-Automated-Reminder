@@ -1,5 +1,0 @@
-Check performed at: 2021-03-29 08:15:00.241347
-
-{
-    "message": "No messages to send."
-}

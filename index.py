@@ -73,11 +73,17 @@ def monthly_revenue_report(subscribed_deals: dict) -> dict:
     return mail_handler_response
 
 def main():
+    print('Running two week check...')
     response = two_week_check()
+    print('Two week check complete!')
     if response["subscribed_deals"]:
+        print('Running MTP data export...')
         csv_response = monthly_revenue_report(response["subscribed_deals"])
         response["csv_response"] = csv_response
+        print('MTP data export complete!')
+    print('Creating log...')
     create_log(response)
+    print('Log created!')
 
 
 main()
