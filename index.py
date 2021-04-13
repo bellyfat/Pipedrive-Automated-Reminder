@@ -36,8 +36,8 @@ def two_week_check():
             "message": "No messages to send."
         }
 
-    #if datetime.datetime.now().day == 1:
-    mail_handler_response["subscribed_deals"] = subscribed_deals
+    if datetime.datetime.now().day == 1:
+        mail_handler_response["subscribed_deals"] = subscribed_deals
 
     return mail_handler_response
 
