@@ -107,9 +107,10 @@ def main():
     print('One day check complete!')
     
     # MTP Data Export
-    print('Running MTP data export...')
-    response["csv_response"] = monthly_revenue_report()
-    print('MTP data export complete!')
+    if datetime.datetime.now().day == 1:
+        print('Running MTP data export...')
+        response["csv_response"] = monthly_revenue_report()
+        print('MTP data export complete!')
     
     # Creating Log
     print('Creating log...')
