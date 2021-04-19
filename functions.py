@@ -41,7 +41,8 @@ def filter_subscribed_deals(pipline_deals: list, stage_id: int) -> list:
     subscribed_deals = list(filter(lambda deal: deal["stage_id"] == stage_id, pipline_deals))
     return subscribed_deals
 
-def filter_almost_finished_subscriptions(subscribed_deals: list) -> list:
+def filter_almost_finished_subscriptions(subscribed_deals: list, weeks:int = None, days:int = None) -> list:
+    filter_length = weeks * 7 if weeks else days
     almost_finished_subscriptions = []
     for deal in subscribed_deals:
         subscription_request_uri = build_request_uri(f'/subscriptions/find/{deal["id"]}')
@@ -50,7 +51,7 @@ def filter_almost_finished_subscriptions(subscribed_deals: list) -> list:
             end_date = datetime.datetime.strptime(subscription_response.json()["data"]["start_date"], "%Y-%m-%d") + datetime.timedelta(days=365)
             current_date = datetime.datetime.now()
             day_count_difference = (end_date - current_date).days
-            if day_count_difference <= 14:
+            if day_count_difference == filter_length:
                 almost_finished_subscriptions.append(deal)
     return almost_finished_subscriptions
 

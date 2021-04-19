@@ -1,8 +1,6 @@
-import csv
 from datetime import datetime
 from email import message
 import smtplib
-import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -75,8 +73,15 @@ class Mailer:
             "csv_file_path": csv_file_path
         }
 
-    def build_almost_finished_subscriptions_two_week_notification_mail_parts(self, almost_finished_subscriptions:list) -> dict:
+    def build_almost_finished_subscriptions_notification_mail_parts(self, almost_finished_subscriptions:list, weeks_to_finish: int = None, days_to_finish: int = None) -> dict:
 
+        if weeks_to_finish:
+            time_remaining_string = f"{weeks_to_finish} {'weeks' if weeks_to_finish > 1 else 'week'}"
+        
+        if days_to_finish:
+            time_remaining_string = f"{days_to_finish} {'days' if days_to_finish > 1 else 'day'}"
+
+        
         subscription_titles = [subscription["title"] for subscription in almost_finished_subscriptions]
         
         # Building the text part
@@ -86,7 +91,7 @@ class Mailer:
         text_part = f"""\
             Good morning!
             
-            The following MyTeamPulse subscriptions are up for renewal in the next 2 weeks,
+            The following MyTeamPulse subscriptions are up for renewal in {time_remaining_string},
             might be a good time to reach out and see how they're getting on.
 
             {text_subscription_titles}
@@ -138,8 +143,8 @@ class Mailer:
                                                 style="margin: 0em 0em 1.5em 0em;font-family: Verdana;box-sizing:border-box;font-size: 14px; text-align: center; width: 90%; color: #666666;">
                                                 <p>
                                                     <strong>Good morning!</strong><br><br>
-                                                    The following MyTeamPulse subscriptions are up for renewal in the next 2
-                                                    weeks, might be a good time to reach out and see how they're getting on.
+                                                    The following MyTeamPulse subscriptions are up for renewal in {time_remaining_string}
+                                                    , might be a good time to reach out and see how they're getting on.
                                                 </p>
                                             </td>
                                         </tr>
