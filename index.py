@@ -64,7 +64,14 @@ def create_log(response: str) -> None:
     except Exception as err:
         print("Failed to create log \n", err)
 
-def monthly_revenue_report(subscribed_deals: dict) -> dict:
+def monthly_revenue_report() -> dict:
+
+    # Getting Subscribed Deals
+    pipeline_id = functions.get_pipeline_id()
+    stage_id = functions.get_stage_id(pipeline_id)
+    pipeline_deals = functions.get_pipeline_deals(pipeline_id)
+    subscribed_deals = functions.filter_subscribed_deals(pipeline_deals, stage_id)
+
     csv_file_path = functions.generate_subscribed_deals_data_for_monthly_revenue_report(subscribed_deals)
     
     # Creating Mailer
@@ -83,20 +90,28 @@ def monthly_revenue_report(subscribed_deals: dict) -> dict:
 
 def main():
     response = {}
+
+    # 2 Weeks
     print('Running two week check...')
     response["two_week_response"] = check(weeks=2)
     print('Two week check complete!')
+    
+    # 1  Week
     print('Running one week check...')
     response["one_week_response"] = check(weeks=1)
     print('One week check complete!')
+    
+    # 1 Day
     print('Running one day check...')
     response["one_day_response"] = check(days=1)
     print('One day check complete!')
-    if response["subscribed_deals"]:
-        print('Running MTP data export...')
-        csv_response = monthly_revenue_report(response["subscribed_deals"])
-        response["csv_response"] = csv_response
-        print('MTP data export complete!')
+    
+    # MTP Data Export
+    print('Running MTP data export...')
+    response["csv_response"] = monthly_revenue_report()
+    print('MTP data export complete!')
+    
+    # Creating Log
     print('Creating log...')
     create_log(response)
     print('Log created!')
